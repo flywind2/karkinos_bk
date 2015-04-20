@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation
+END
+DbSNPAnnotation.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/repos/ueda/!svn/ver/60/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation/DbSNPAnnotation.java
+END
+MappabilityAnnotation.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation/MappabilityAnnotation.java
+END
+TESTDBSNPGet.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/repos/ueda/!svn/ver/55/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation/TESTDBSNPGet.java
+END
+DbSNPBean.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/repos/ueda/!svn/ver/60/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation/DbSNPBean.java
+END

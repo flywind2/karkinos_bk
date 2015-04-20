@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils
+END
+Interval.java
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/Interval.java
+END
+LittleEndian.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/LittleEndian.java
+END
+PositionBrocks.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/PositionBrocks.java
+END
+ReadWriteBase.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repos/ueda/!svn/ver/62/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/ReadWriteBase.java
+END
+TwoBitGenomeReader.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/repos/ueda/!svn/ver/62/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/TwoBitGenomeReader.java
+END
+ListUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/ListUtils.java
+END
+OptionComparator.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/repos/ueda/!svn/ver/22/karkinos/src/jp/ac/utokyo/rcast/karkinos/utils/OptionComparator.java
+END

@@ -1,0 +1,52 @@
+8
+
+dir
+22
+http://192.168.8.11/repos/ueda/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotation/loadsave
+http://192.168.8.11/repos/ueda
+
+
+
+2012-06-15T14:34:50.693449Z
+22
+ueda
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+109d8c83-bb71-4164-826e-b0cd8a06d4bb
+
+LoadSave.java
+file
+59
+
+
+
+2013-05-27T03:43:25.000000Z
+14c8b468ab3611c354fbba9fe81e69ae
+2013-06-07T20:00:07.648326Z
+59
+ueda
+
+SaveBean.java
+file
+60
+
+
+
+2013-06-07T12:00:33.000000Z
+168c527a51a07eec2b5978f02922bf0c
+2013-08-21T16:45:40.809253Z
+60
+ueda
+

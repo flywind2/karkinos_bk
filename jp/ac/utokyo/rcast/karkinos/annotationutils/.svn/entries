@@ -1,0 +1,40 @@
+8
+
+dir
+22
+http://192.168.8.11/repos/ueda/karkinos/src/jp/ac/utokyo/rcast/karkinos/annotationutils
+http://192.168.8.11/repos/ueda
+
+
+
+2012-06-15T14:34:50.693449Z
+22
+ueda
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+109d8c83-bb71-4164-826e-b0cd8a06d4bb
+
+AnnoverOutputJoin.java
+file
+60
+
+
+
+2013-07-01T09:33:46.000000Z
+16ae736faf86f014ce4d1376dd89f338
+2013-08-21T16:45:40.809253Z
+60
+ueda
+
