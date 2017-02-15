@@ -77,6 +77,7 @@ public class DepthCounter implements java.io.Serializable {
 
 	public void add(String chr, int pos, int depth, int ontarget) {
 
+		//System.out.println("ontag=" + ontarget +" " + chr +" " + pos);
 		if (depth < KarkinosProp.mindepth) {
 
 			boolean extendInterval = false;

@@ -207,10 +207,10 @@ public class PileUP implements java.io.Serializable {
 		int[] tret = setPileUP(tumor, chr, pos, genomeR, tumorList, indexes[1]);
 		int tdepth = tret[0];
 		int tidx = tret[1];
-		int tontarget = nret[2];
+		//int tontarget = nret[2];
 		
 		ret[1] = tidx;
-		readsSummary.setTumorDepth(chr, pos, tdepth, tontarget);
+		readsSummary.setTumorDepth(chr, pos, tdepth, nontarget);
 		readsSummary.setNucCount(genomeR);
 		
 		boolean targetSeq = dataset.targetSeq;
