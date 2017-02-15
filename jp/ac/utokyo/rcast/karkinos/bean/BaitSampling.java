@@ -15,7 +15,7 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.bean;
 
-import static jp.ac.utokyo.rcast.karkinos.bean.BaitSampling.bait_sample_length;
+import htsjdk.samtools.SAMRecord;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,10 +23,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
-import net.sf.samtools.SAMRecord;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class BaitSampling implements Serializable {
 

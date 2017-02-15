@@ -15,13 +15,11 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.readssummary;
 
-import java.util.HashSet;
-import java.util.Map;
+import htsjdk.samtools.SAMRecord;
+
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
-
-import net.sf.samtools.SAMRecord;
 
 public class ReadsCounter implements java.io.Serializable {
 

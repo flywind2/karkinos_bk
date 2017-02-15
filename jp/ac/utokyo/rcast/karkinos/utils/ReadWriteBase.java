@@ -15,16 +15,17 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.utils;
 
+import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileHeader.SortOrder;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.ValidationStringency;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMFileWriter;
-import net.sf.samtools.SAMFileWriterFactory;
-import net.sf.samtools.SAMFileHeader.SortOrder;
 
 public abstract class ReadWriteBase {
 
@@ -40,7 +41,7 @@ public abstract class ReadWriteBase {
 				|| sfh.getAttribute("SO").equals("sorted")) {
 			sfh.setSortOrder(SortOrder.coordinate);
 		}
-		reader.setValidationStringency(SAMFileReader.ValidationStringency.SILENT);
+		reader.setValidationStringency(ValidationStringency.SILENT);
 		
 		return reader;
 	}
@@ -53,7 +54,7 @@ public abstract class ReadWriteBase {
 				|| sfh.getAttribute("SO").equals("sorted")) {
 			sfh.setSortOrder(SortOrder.coordinate);
 		}
-		reader.setValidationStringency(SAMFileReader.ValidationStringency.SILENT);
+		reader.setValidationStringency(ValidationStringency.SILENT);
 		return reader;
 	}
 

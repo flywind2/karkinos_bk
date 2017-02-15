@@ -15,23 +15,19 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.wavelet;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
 import jp.ac.utokyo.rcast.karkinos.exec.DataSet;
 import jp.ac.utokyo.rcast.karkinos.exec.KarkinosProp;
-import math.transform.jwave.Transform;
-import math.transform.jwave.handlers.FastWaveletTransform;
-import math.transform.jwave.handlers.wavelets.Haar02;
+import jwave.Transform;
+import jwave.transforms.FastWaveletTransform;
+import jwave.transforms.wavelets.haar.Haar1;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class WaveletDenoize {
 
@@ -440,7 +436,7 @@ public class WaveletDenoize {
 			}
 		}
 
-		Transform t = new Transform(new FastWaveletTransform(new Haar02()));
+		Transform t = new Transform(new FastWaveletTransform(new Haar1()));
 		// System.out.println("input size="+input.length);
 		double[] arrHilb = t.forward(input); // 1-D AED FWT Haar forward
 

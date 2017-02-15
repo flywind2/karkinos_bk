@@ -15,6 +15,10 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.utils;
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.util.CloseableIterator;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,18 +30,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
-
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.util.CloseableIterator;
 
 import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
 import jp.ac.utokyo.rcast.karkinos.exec.CaptureHolder;
 import jp.ac.utokyo.rcast.karkinos.exec.KarkinosProp;
-import jp.ac.utokyo.rcast.karkinos.summary.Filebean;
 
 public class MakeAveDepth extends ReadWriteBase {
 

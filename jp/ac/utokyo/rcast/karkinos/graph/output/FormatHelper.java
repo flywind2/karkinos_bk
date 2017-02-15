@@ -12,7 +12,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package jp.ac.utokyo.rcast.karkinos.graph.output;
 
 import java.io.IOException;
@@ -25,6 +25,7 @@ import jp.ac.utokyo.rcast.karkinos.exec.PileUP;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult;
 import jp.ac.utokyo.rcast.karkinos.exec.SNVHolder;
 import jp.ac.utokyo.rcast.karkinos.filter.FilterResult;
+import jp.ac.utokyo.rcast.karkinos.filter.FilterSNP;
 import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
 import jp.ac.utokyo.rcast.karkinos.utils.CalcUtils;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
@@ -76,6 +77,86 @@ public class FormatHelper {
 
 	}
 
+	public static String[] getLine(SNVHolder snv, TwoBitGenomeReader tgr,
+			GeneExons ge) {
+
+		String[] data = new String[16];
+		// chr
+		data[0] = snv.getChr().replace("chr", "");
+		// pos
+		data[1] = String.valueOf(snv.getPos());
+		String freq = "";
+		if (snv.getDbSNPbean() != null) {
+			// id
+			data[2] = snv.getDbSNPbean().getInfo();
+			if (snv.getDbSNPbean().getMode() == DbSNPAnnotation.MODE1000g) {
+				//
+				freq = String.valueOf(snv.getDbSNPbean().getFreq());
+			}
+		} else {
+			data[2] = ".";
+		}
+		PileUPResult pir = snv.getNormal();
+		char genome = pir.getGenomeR();
+		// ref
+		data[3] = String.valueOf(Character.toUpperCase(genome));
+		// alt
+		data[4] = String.valueOf(Character.toUpperCase(pir.getALT()));
+		// qual
+		data[5] = String.valueOf((pir.getPhred() / 10));
+		// refcnt;
+		data[6] = String.valueOf(pir.getRefCnt());
+		// altcnt;
+		data[7] = String.valueOf(pir.getAltCnt());
+		// freq;
+		data[8] = String.valueOf(pir.getRatio());
+
+		PileUPResult pirt = snv.getTumor();
+		// alt
+		data[9] = String.valueOf(Character.toUpperCase(pir.getALT()));
+		// qual
+		data[10] = String.valueOf((pirt.getPhred() / 10));
+		// refcnt;
+		data[11] = String.valueOf(pirt.getRefCnt());
+		// altcnt;
+		data[12] = String.valueOf(pirt.getAltCnt());
+		// freq;
+		data[13] = String.valueOf(pirt.getRatio());
+
+		// info
+		data[14] = getInfoStr4Normal(snv, ge, freq);
+
+		// tn ratio
+		data[15] = String.valueOf(getInfoTN_AFratio(snv));
+		//
+
+		return data;
+
+	}
+
+	public static String getVCFLineAllDiff(SNVHolder snv,
+			TwoBitGenomeReader tgr, GeneExons ge) {
+
+		int flg = snv.getFlg();
+		try {
+
+			if (flg == PileUP.REGBOTH || flg == PileUP.NormalSNP
+					|| flg == PileUP.NONSignif || flg == PileUP.SomaticMutation) {
+				String[] data = FormatHelper.getVCFCol4Normal(snv, ge);
+				return FormatHelper.tabDelimated(data);
+			} else if (flg == PileUP.BothINDEL || flg == PileUP.NormalINDEL
+					|| flg == PileUP.TumorINDEL) {
+				String[] data = FormatHelper
+						.getVCFColIndel4Normal(snv, tgr, ge);
+				return FormatHelper.tabDelimated(data);
+			}
+
+		} catch (Exception ex) {
+
+		}
+		return null;
+	}
+
 	public static String getVCFLine4SNP(SNVHolder snv, TwoBitGenomeReader tgr,
 			GeneExons ge) throws IOException {
 
@@ -117,8 +198,9 @@ public class FormatHelper {
 		// alt
 		data[4] = String.valueOf(Character.toUpperCase(pir.getALT()));
 		// qual
-		data[5] = String.valueOf(pir.getPhred());
-		data[6] = "PASS";
+		data[5] = String.valueOf((pir.getPhred() / 10));
+
+		data[6] = FilterSNP.filter(pir);
 		// info
 		data[7] = getInfoStr4Normal(snv, ge, freq);
 		// tn ratio
@@ -180,44 +262,45 @@ public class FormatHelper {
 		// tumor
 		data[10] = getAlleleStr(snv.getTumor());
 		//
-		data[11] = b4; 
-		data[12] = after; 
-		
+		data[11] = b4;
+		data[12] = after;
+
 		return data;
 	}
 
 	private static float getScore(SNVHolder snv, String fs) {
-		
+
 		float score = 0;
 		int errorcount = snv.getFilterResult().getPassFilterFlg().size();
-		if(errorcount>2){
+		if (errorcount > 2) {
 			score = 0;
 		}
-		if(errorcount==2){
+		if (errorcount == 2) {
 			score = 0.2f;
-			score = gradient(0.002,score,snv.getTumor().getAltCnt());
+			score = gradient(0.002, score, snv.getTumor().getAltCnt());
 		}
-		if(errorcount==1){
+		if (errorcount == 1) {
 			score = 0.5f;
-			score = gradient(0.002,score,snv.getTumor().getAltCnt());
+			score = gradient(0.002, score, snv.getTumor().getAltCnt());
 		}
-		
-		if(fs.equals("PASS")){
+
+		if (fs.equals("PASS")) {
 			score = 0.8f;
-			score = gradient(0.01,score,snv.getTumor().getAltCnt());
+			score = gradient(0.01, score, snv.getTumor().getAltCnt());
 		}
 		String ps = getFilter2Str(snv, fs);
-		if(ps.equals("PASS")){
+		if (ps.equals("PASS")) {
 			score = 0.95f;
-			score = gradient(0.01,score,snv.getTumor().getAltCnt());
-		}		
+			score = gradient(0.01, score, snv.getTumor().getAltCnt());
+		}
 		return score;
 	}
 
-	private static float gradient(double r,float score, int i) {
-		
-		score = (float)(score +(r*i));
-		if(score>1)score = 1;		
+	private static float gradient(double r, float score, int i) {
+
+		score = (float) (score + (r * i));
+		if (score > 1)
+			score = 1;
 		return score;
 	}
 
@@ -242,9 +325,7 @@ public class FormatHelper {
 		StringBuffer genome = new StringBuffer();
 		StringBuffer alt = new StringBuffer();
 		int adjustedpos = snv.getPos();
-		
-		
-		
+
 		if (pir.isInsersion()) {
 			//
 			genome.append(tgr.getGenomicSeq(snv.getChr(), snv.getPos() - 1,
@@ -316,15 +397,15 @@ public class FormatHelper {
 		data[6] = fs;
 		// info
 		float score = getScore(snv, fs);
-		data[7] = getInfoStr(snv, tumorRratio, na,score);
+		data[7] = getInfoStr(snv, tumorRratio, na, score);
 		data[8] = getFilter2Str(snv, fs);
 		// normal
 		data[9] = getAlleleStr(snv.getNormal());
 		// tumor
 		data[10] = getAlleleStr(snv.getTumor());
 		//
-		data[11] = b4; 
-		data[12] = after; 
+		data[11] = b4;
+		data[12] = after;
 		return data;
 	}
 
@@ -392,7 +473,7 @@ public class FormatHelper {
 		FilterResult fr = snv.getFilterResult();
 
 		Set<Integer> flgs = null;
-		String fs = "PASS";
+		String fs = FilterSNP.filterIndel(pir);
 		data[6] = fs;
 		// info
 		data[7] = getInfoStr4Normal(snv, ge, freq);

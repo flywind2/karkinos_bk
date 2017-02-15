@@ -15,6 +15,8 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.readssummary;
 
+import htsjdk.samtools.SAMRecord;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -22,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jp.ac.utokyo.rcast.karkinos.utils.Interval;
-
-import net.sf.samtools.SAMRecord;
 
 public class ReadsSummary implements java.io.Serializable {
 

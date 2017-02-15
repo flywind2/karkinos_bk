@@ -12,8 +12,28 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package jp.ac.utokyo.rcast.karkinos.filter;
+
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.CONTAIN_Reccurent_MISMATCH;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.INFO_AllelicInfoAvailable;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.INFO_SUPPORTED_BY_ONEDirection;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.LOW_PROPER;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.MutationAtSameCycle;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.NEARINDEL;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.NOISE_IN_NORMAL;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.READSENDSONLY;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.SUPPORTED_BY_ONEDirection;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.SUPPORTED_READSNG;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.TNQualityDiff;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.TooManyMismatchReads;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.noStrandSpecific;
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.softClip;
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.CigarOperator;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.util.CloseableIterator;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +46,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPBean;
 import jp.ac.utokyo.rcast.karkinos.annotation.stats.Fisher;
@@ -37,16 +55,11 @@ import jp.ac.utokyo.rcast.karkinos.exec.PileUP;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPPool;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult.Counter;
-import jp.ac.utokyo.rcast.karkinos.utils.CalcUtils;
 import jp.ac.utokyo.rcast.karkinos.utils.OddRatioCalculator;
 import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.CigarOperator;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.util.CloseableIterator;
-import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.*;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class SupportReadsCheck extends ReadWriteBase {
 
@@ -81,9 +94,15 @@ public class SupportReadsCheck extends ReadWriteBase {
 		//
 		// String bam =
 		// "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.8/summary_cfDNA1/bam/Se-67-tumor25-Se-67_b-DNA_tumor_genome.bam";
-		String nbam = "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT30-2-MT30N/normal/MT30-2-MT30N_normal_genome.bam";
-		String bam = "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT30-2-MT30N/tumor/MT30-2-MT30N_tumor_genome.bam";
+		// String nbam =
+		// "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT30-2-MT30N/normal/MT30-2-MT30N_normal_genome.bam";
+		// String bam =
+		// "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT30-2-MT30N/tumor/MT30-2-MT30N_tumor_genome.bam";
 		String twobitref = "/GLUSTER_DIST/data/Genomes/hg19_all/hg19.2bit";
+
+		String nbam = "/data3/users/yamamoto/exome/CRC/karkinos4.1.11/summary_CRC_all_samples/bam/CRC107_T-CRC107_N_normal_genome.bam";
+		String bam = "/data3/users/yamamoto/exome/CRC/karkinos4.1.11/summary_CRC_all_samples/bam/CRC107_T-CRC107_N_tumor_genome.bam";
+		String middelfile = "/GLUSTER_DIST/data/users/yamamoto/exome/CRC/karkinos2.0.3/CRC_107_T-CRC_107_N/sobj";
 
 		TwoBitGenomeReader tgr = new TwoBitGenomeReader(new File(twobitref));
 		DbSNPAnnotation dbAnno = null;
@@ -94,16 +113,17 @@ public class SupportReadsCheck extends ReadWriteBase {
 		pileUPResult.setGenomeRef('C');
 
 		IndelInfo ii = new IndelInfo();
-//		ii.indel = true;
-//		ii.length = 17;
-//		ii.cnt = 13;
-//		// ii.insersion = "G";
+		// ii.indel = true;
+		// ii.length = 17;
+		// ii.cnt = 13;
+		// // ii.insersion = "G";
 
 		pileUPResult.setBaseAndQual('A', (byte) 50, 1, ii);
 		Map<String, Integer> snppos = new HashMap<String, Integer>();
 		try {
-			inst.checkSupportReads("chr17", 7577114, pileUPResult, PileUP.SomaticMutation, 0.2f,PileUP.SomaticMutation,
-					false, 10, snppos, 0.2f, 0.2f);
+			inst.checkSupportReads("chr12", 25398284, pileUPResult,
+					PileUP.SomaticMutation, 0.2f, PileUP.SomaticMutation,
+					false, 10, snppos, 0.2f, 0.2f, 0f, 0f);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -115,7 +135,8 @@ public class SupportReadsCheck extends ReadWriteBase {
 			PileUPResult pileUPResult, int pileupFlg, float tumorratioss,
 			double copynumber, boolean highisoform, int normalTotal,
 			Map<String, Integer> snppos, float adjustedTumorAllereFreq,
-			float normalAF) throws IOException {
+			float normalAF, float oxoGratio, float ffpeRatio)
+			throws IOException {
 
 		// boolean debug = false;
 
@@ -147,10 +168,16 @@ public class SupportReadsCheck extends ReadWriteBase {
 		List<BaseandQData> pileuplist = new ArrayList<BaseandQData>();
 		Map<Integer, SCounter> cycleCheck = new HashMap<Integer, SCounter>();
 
+		int f1r2support = 0;
+		int f2r1support = 0;
+
+		int f1r2else = 0;
+		int f2r1else = 0;
+
 		while (ite.hasNext()) {
 
 			SAMRecord sam = ite.next();
-			//System.out.println(sam.getReadString());
+			// System.out.println(sam.getReadString());
 			allreads.add(sam);
 			int[] reta = containTargetMutation(pos, pileUPResult, sam,
 					pileupFlg);
@@ -164,10 +191,12 @@ public class SupportReadsCheck extends ReadWriteBase {
 				if ((int) qual < KarkinosProp.minPhredQualForEach) {
 					continue;
 				}
-	
+
 				pileuplist.add(new BaseandQData(ch, qual));
 				//
 			}
+			int flg = sam.getFlags();
+			// System.out.println(flg);
 
 			if (samContatinMutation) {
 
@@ -175,8 +204,22 @@ public class SupportReadsCheck extends ReadWriteBase {
 				// if (sam.getFirstOfPairFlag()) {
 				if (sam.getReadNegativeStrandFlag()) {
 					leftsupport++;
+
+					if (sam.getFirstOfPairFlag()) {
+						f2r1support++;
+					} else {
+						f1r2support++;
+					}
+
 				} else {
 					rightsupport++;
+
+					if (sam.getFirstOfPairFlag()) {
+						f1r2support++;
+					} else {
+						f2r1support++;
+					}
+
 				}
 
 				if (sam.getReadPairedFlag()) {
@@ -210,8 +253,22 @@ public class SupportReadsCheck extends ReadWriteBase {
 				// if (sam.getFirstOfPairFlag()) {
 				if (sam.getReadNegativeStrandFlag()) {
 					leftelse++;
+
+					if (sam.getFirstOfPairFlag()) {
+						f2r1else++;
+					} else {
+						f1r2else++;
+					}
+
 				} else {
 					rightelse++;
+
+					if (sam.getFirstOfPairFlag()) {
+						f1r2else++;
+					} else {
+						f2r1else++;
+					}
+
 				}
 				// } else {
 				// if (sam.getReadNegativeStrandFlag()) {
@@ -284,7 +341,70 @@ public class SupportReadsCheck extends ReadWriteBase {
 			return ret;
 		}
 
+		double fisherP2 = 1;
+		if (f1r2support == 0 || f2r1support == 0) {
+			// return SUPPORTED_BY_ONEDirection;
+			filter.add(INFO_SUPPORTED_BY_ONEDirection);
+			fisherP2 = Fisher.calcPValue(f1r2else, f2r1else, f1r2support,
+					f2r1support);
+
+			boolean f1r2 = (f2r1support == 0);
+			boolean oxoGCand = oxoG(pileUPResult.getGenomeR(),
+					pileUPResult.getALT(), f1r2);
+			boolean ffpeCand = ffpe(pileUPResult.getGenomeR(),
+					pileUPResult.getALT(), f1r2);
+
+			double thres = KarkinosProp.Fisher_Thres_For_Reads_Direction;
+
+			if (oxoGCand) {
+
+				if (f1r2support <= 6 && f2r1support <= 6) {
+
+					if (oxoGratio > 0.1) {
+						thres = KarkinosProp.Fisher_Thres_For_Reads_Direction2;
+					}
+
+				}
+
+				// if (oxoGratio > 0.2) {
+				// thres = KarkinosProp.Fisher_Thres_For_Reads_Direction3;
+				// }
+
+				// System.out.println("oxoG" + pileUPResult.getGenomeR() +" "
+				// +pileUPResult.getALT() + "P=" + fisherP2+" " +f1r2else+" "
+				// +f2r1else+" "+ f1r2support+" "+f2r1support);
+
+			}
+			if (ffpeCand) {
+
+				if (f1r2support <= 8 && f2r1support <= 8) {
+					
+					if (ffpeRatio > 0.1) {
+						thres = KarkinosProp.Fisher_Thres_For_Reads_Direction2;
+					}
+					if (ffpeRatio > 0.2) {
+						thres = KarkinosProp.Fisher_Thres_For_Reads_Direction3;
+					}
+				}
+				// if (f1r2support >= 6 || f2r1support >= 6) {
+				// thres = 1;
+				// }
+
+				// System.out.println("ffpe" + pileUPResult.getGenomeR() +" "
+				// +pileUPResult.getALT() + "P=" + fisherP2+" " +f1r2else+" "
+				// +f2r1else+" "+ f1r2support+" "+f2r1support);
+
+			}
+			//
+
+			boolean fisherSignif = (fisherP2 <= thres);
+			if (fisherSignif) {
+				filter.add(SUPPORTED_BY_ONEDirection);
+			}
+		}
+
 		double fisherP = 1;
+
 		if (leftsupport == 0 || rightsupport == 0) {
 			// return SUPPORTED_BY_ONEDirection;
 			filter.add(INFO_SUPPORTED_BY_ONEDirection);
@@ -294,6 +414,7 @@ public class SupportReadsCheck extends ReadWriteBase {
 			if (fisherSignif) {
 				filter.add(SUPPORTED_BY_ONEDirection);
 			}
+
 			// if (cycleCheck.size() <= 1) {
 			// if (!pileUPResult.isIndel()) {
 			// filter.add(MutationAtSameCycle);
@@ -506,6 +627,46 @@ public class SupportReadsCheck extends ReadWriteBase {
 
 	}
 
+	public static boolean ffpe(char genomeR, char alt, boolean f1r2) {
+
+		// if (genomeR == 'C' && alt == 'T' && f1r2) {
+		// return true;
+		// }
+		// if (genomeR == 'G' && alt == 'A' && !f1r2) {
+		// return true;
+		// }
+		if (genomeR == 'C' && alt == 'T') {
+			return true;
+		}
+		if (genomeR == 'G' && alt == 'A') {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean oxoG(char genomeR, char alt, boolean f1r2) {
+
+		if (genomeR == 'C' && alt == 'A' && f1r2) {
+			return true;
+		}
+		if (genomeR == 'G' && alt == 'T' && !f1r2) {
+			return true;
+		}
+		return false;
+
+	}
+
+	public static boolean oxoG(char genomeR, char alt) {
+		// TODO Auto-generated method stub
+		return oxoG(genomeR, alt, true) || oxoG(genomeR, alt, false);
+	}
+
+	public static boolean ffpe(char genomeR, char alt) {
+
+		return ffpe(genomeR, alt, true) || ffpe(genomeR, alt, false);
+	}
+
+	//
 	private boolean normalCheck(String chr, int pos, PileUPResult pileUPResult)
 			throws IOException {
 
@@ -555,7 +716,7 @@ public class SupportReadsCheck extends ReadWriteBase {
 			SAMRecord sam = ite.next();
 			list.add(sam);
 			Integer nm = sam.getIntegerAttribute("NM");
-			if (nm!=null && nm >= 3) {
+			if (nm != null && nm >= 3) {
 				mismatchL.add(sam);
 			}
 
@@ -1204,7 +1365,7 @@ public class SupportReadsCheck extends ReadWriteBase {
 					}
 				}
 				if (ce.getOperator() == CigarOperator.N) {
-					
+
 					if (relpos < refidx + len) {
 						return -1;
 					}

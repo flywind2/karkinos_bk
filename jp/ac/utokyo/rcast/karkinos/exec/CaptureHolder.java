@@ -15,11 +15,12 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec;
 
+import htsjdk.samtools.SAMRecord;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,9 +39,6 @@ import java.util.TreeMap;
 
 import jp.ac.utokyo.rcast.karkinos.utils.Interval;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
-
-import net.sf.samtools.SAMRecord;
 
 public class CaptureHolder implements java.io.Serializable {
 

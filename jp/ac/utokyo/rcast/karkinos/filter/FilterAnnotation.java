@@ -231,6 +231,30 @@ public class FilterAnnotation {
 		
 		float tumorContentsRatio = dataset.getTumorRatio();
 
+		int allcount = 0;
+		int oxoGcnt = 0;
+		int ffpecnt = 0;
+		
+		
+		for (SNVHolder snv : dataset.getSnvlist()) {
+			//
+			//
+			allcount++;
+			boolean oxoGCand = SupportReadsCheck.oxoG(snv.getTumor().getGenomeR(), snv.getTumor().getALT());
+			boolean ffpeCand = SupportReadsCheck.ffpe(snv.getTumor().getGenomeR(), snv.getTumor().getALT());
+			if(oxoGCand){
+				oxoGcnt++;
+			}
+			if(ffpeCand){
+				ffpecnt++;
+			}
+			
+		}
+		float oxoGratio =  (float)((double)oxoGcnt/(double)allcount) ;
+		float ffpeRatio =  (float)((double)ffpecnt/(double)allcount) ;
+		
+		System.out.println("oxoGratio ="+oxoGratio +" ffpe="+ffpeRatio);
+		
 		for (SNVHolder snv : dataset.getSnvlist()) {
 
 //			if(snv.getPos()==debugpos){
@@ -416,7 +440,7 @@ public class FilterAnnotation {
 							.getTumorratio(),
 					(snv.getCi().getVaridateVal() * 2), highisoform,
 					normalTotal, snppos, adjustedTumorAllereFreq, snv
-							.getNormal().getRatio());
+							.getNormal().getRatio(),oxoGratio,ffpeRatio);
 
 			Set<Integer> supportReadsFlgs = srr.getFilter();
 			fr.setPval4FiserDirectional(srr.getPval4directionCheck());
@@ -501,6 +525,8 @@ public class FilterAnnotation {
 		SNVHighDepthCounter snvc = new SNVHighDepthCounter(dataset);
 		na = new NoiseAnalysis();
 		na.analysisNoiseRegion(dataset, ploidy);
+		
+		
 		for (SNVHolder snv : dataset.getSnvlist()) {
 
 			int flg = snv.getFlg();

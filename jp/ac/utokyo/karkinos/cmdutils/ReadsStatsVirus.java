@@ -15,6 +15,11 @@ limitations under the License.
 */
 package jp.ac.utokyo.karkinos.cmdutils;
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.util.CloseableIterator;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -22,10 +27,7 @@ import java.util.List;
 
 import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
 
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMSequenceRecord;
-import net.sf.samtools.util.CloseableIterator;
+
 
 public class ReadsStatsVirus extends ReadWriteBase {
 	

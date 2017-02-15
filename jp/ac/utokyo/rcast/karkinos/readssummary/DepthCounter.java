@@ -95,22 +95,23 @@ public class DepthCounter implements java.io.Serializable {
 		}
 		sumdepth = sumdepth + depth;
 		total++;
+		int depthkey =0;
 		if (depth >= 1000) {
-			depth = 1000;
+			depthkey = 1000;
 			// }else if(depth>=300){
 			// depth = (depth/100)*100;
 		} else if (depth >= 10) {
-			depth = (depth / 10) * 10;
+			depthkey = (depth / 10) * 10;
 		} else if (depth > 0) {
-			depth = 1;
+			depthkey = 1;
 		}
 
 		CounterA counter = null;
-		if (!map.containsKey(depth)) {
+		if (!map.containsKey(depthkey)) {
 			counter = new CounterA();
-			map.put(depth, counter);
+			map.put(depthkey, counter);
 		} else {
-			counter = map.get(depth);
+			counter = map.get(depthkey);
 		}
 		counter.inc();
 		
@@ -121,7 +122,7 @@ public class DepthCounter implements java.io.Serializable {
 			
 		}
 		
-		if(onCDS(chr,pos)){
+		if(onCDS(chr,pos)&&ontarget==1){
 			sumcdsdepth = sumcdsdepth + depth;
 			 totalcds++;
 			 if(depth>=10){

@@ -15,7 +15,6 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.summary;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,7 +25,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;

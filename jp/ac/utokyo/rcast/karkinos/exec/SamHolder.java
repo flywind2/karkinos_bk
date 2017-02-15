@@ -15,7 +15,7 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec;
 
-import net.sf.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecord;
 
 public class SamHolder implements java.io.Serializable {
 

@@ -15,6 +15,8 @@ limitations under the License.
 */
 package jp.ac.utokyo.karkinos.noisefilter;
 
+import static jp.ac.utokyo.rcast.karkinos.filter.FilterResult.INFO_SUPPORTED_BY_ONEDirection;
+
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ import jp.ac.utokyo.rcast.karkinos.exec.DataSet;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUP;
 import jp.ac.utokyo.rcast.karkinos.exec.SNVHolder;
 import jp.ac.utokyo.rcast.karkinos.filter.FilterResult;
+import jp.ac.utokyo.rcast.karkinos.filter.SupportReadsCheck;
 import jp.ac.utokyo.rcast.karkinos.readssummary.SNPDepthCounter;
 import jp.ac.utokyo.rcast.karkinos.utils.CalcUtils;
 import jp.ac.utokyo.rcast.karkinos.utils.GenotypeKeyUtils;
@@ -208,7 +211,18 @@ public class NoiseAnalysis {
 		int depth = snv.getTumor().getTotalcnt();
 		int depth_c = (int) (depth * tumorContentsRatio);
 		
+		boolean oxoGCand = SupportReadsCheck.oxoG(snv.getTumor().getGenomeR(), snv.getTumor().getALT());
+		boolean ffpeCand = SupportReadsCheck.ffpe(snv.getTumor().getGenomeR(), snv.getTumor().getALT());
+		boolean onedirec = snv.getFilterResult().getInfoFlg().contains(INFO_SUPPORTED_BY_ONEDirection);
+		
+		
+		if((oxoGCand||ffpeCand ) && onedirec){
+			return afm._reject(depth_c, adjusttedAF);
+		}
+		
 		return afm.reject(depth_c, adjusttedAF,highErrorSample);
+		
+		
 
 		// if(indel){
 		// //since indel is hard to detect

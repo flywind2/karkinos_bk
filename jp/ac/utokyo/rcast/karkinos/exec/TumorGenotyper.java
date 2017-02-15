@@ -15,28 +15,17 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec;
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.util.CloseableIterator;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
-import net.sf.samtools.util.CloseableIterator;
 import jp.ac.utokyo.karkinos.noisefilter.NoiseAnalysis;
 import jp.ac.utokyo.karkinos.ploidy.MatchMatrixBean;
 import jp.ac.utokyo.karkinos.ploidy.PloidyResolve;
@@ -46,8 +35,7 @@ import jp.ac.utokyo.rcast.karkinos.alleliccnv.CheckPossibleHDAmp;
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.LoadSave;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.SaveBean;
-import jp.ac.utokyo.rcast.karkinos.distribution.AnalyseDist;
-import jp.ac.utokyo.rcast.karkinos.exec.Coverage.IntervalCov;
+import jp.ac.utokyo.rcast.karkinos.filter.DefinedSites;
 import jp.ac.utokyo.rcast.karkinos.filter.FilterAnnotation;
 import jp.ac.utokyo.rcast.karkinos.graph.output.CNVVcf;
 import jp.ac.utokyo.rcast.karkinos.graph.output.FileOutPut;
@@ -60,6 +48,7 @@ import jp.ac.utokyo.rcast.karkinos.hmm.HMMCNVAnalysisFromEM;
 import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
 import jp.ac.utokyo.rcast.karkinos.readssummary.ReadsSummary;
 import jp.ac.utokyo.rcast.karkinos.utils.CorrelVaridate;
+import jp.ac.utokyo.rcast.karkinos.utils.GeneEachCNV;
 import jp.ac.utokyo.rcast.karkinos.utils.Interval;
 import jp.ac.utokyo.rcast.karkinos.utils.ListUtils;
 import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
@@ -67,11 +56,16 @@ import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
 import jp.ac.utokyo.rcast.karkinos.wavelet.EMMethod;
 import jp.ac.utokyo.rcast.karkinos.wavelet.GCParcentAdjust;
-import jp.ac.utokyo.rcast.karkinos.wavelet.MovingAverage;
-import jp.ac.utokyo.rcast.karkinos.wavelet.Peak;
 import jp.ac.utokyo.rcast.karkinos.wavelet.PeaksInfo;
 import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletDenoize;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class TumorGenotyper extends ReadWriteBase {
 
@@ -158,6 +152,10 @@ public class TumorGenotyper extends ReadWriteBase {
 
 		optionlist.add(getOption("nopdf", "nopdf", false,
 				"no graphic summary pdf output", false));
+		
+		
+		optionlist.add(getOption("sites", "pileupsites", true,
+				"disgnated pileup sites", false));
 
 		// optionlist.add(getOption("cb", "chrBands", true,
 		// "Chromosome Band",false));
@@ -290,6 +288,11 @@ public class TumorGenotyper extends ReadWriteBase {
 					.equalsIgnoreCase("true");
 		}
 
+		String sites = null;
+		if (cl.hasOption("sites")) {
+			sites = cl.getOptionValue("sites");					
+		}
+		
 		
 		
 		boolean allfileexsist = fileExsistanceCheck(files);
@@ -346,7 +349,7 @@ public class TumorGenotyper extends ReadWriteBase {
 		} else {
 			System.out.println("load date from bam files");
 			bean = getReadsAndPileupDataFromBam(normalbamf, tumorbamf, tgr,
-					targetRegion, outputsave, targetChr,startend, refflat);
+					targetRegion, outputsave, targetChr,startend, refflat,sites);
 		}
 		// debug
 		// fullanalysis=true;
@@ -356,10 +359,10 @@ public class TumorGenotyper extends ReadWriteBase {
 			// analysis(bean, dbSNP, mappability, tgr, tumorbamf, g1000,
 			// g1000thres,cosmic, -1,exonSNP,ge);
 			analysisNew(bean, dbSNP, mappability, tgr, normalbamf,tumorbamf, g1000,
-					g1000thres, cosmic, -1, exonSNP, ge, useAvearageNormal);
+					g1000thres, cosmic, -1, exonSNP, ge, useAvearageNormal,sites);
 			// output
 			output(bean, outdir, tgr, id, readsStat, alCNV, ge, na, pi,
-					baseploidy, nopdf);
+					baseploidy, nopdf,refflat,sites);
 		}
 	}
 
@@ -494,15 +497,13 @@ public class TumorGenotyper extends ReadWriteBase {
 	protected void analysisNew(SaveBean bean, String dbSNP, String mappability,
 			TwoBitGenomeReader tgr,String normalbamf, String tumorbamf, String g1000,
 			float g1000thres, String cosmic, double fixtumorratio,
-			String exonSNP, GeneExons ge, boolean useAvearageNormal)
+			String exonSNP, GeneExons ge, boolean useAvearageNormal, String sites)
 			throws IOException, ClassNotFoundException {
 
 		System.out.println("analysis start");
 
 		DataSet dataset = bean.getDataset();
 		//debug
-
-		
 		
 		dataset.setUseAvearageNormal(useAvearageNormal);
 		ReadsSummary readsSummary = bean.getReadsSummary();
@@ -510,6 +511,10 @@ public class TumorGenotyper extends ReadWriteBase {
 		// // Excute CNV analysis using wavelet transform
 		// System.out.println("CNV analysis 1 start");
 		GCParcentAdjust.calc(dataset);
+		
+			
+		GeneEachCNV.calcCNVForEachgene(dataset,ge);
+		
 		denoizeWTAndHMM(dataset);
 		// if CNV exceed max num 50 denoize more
 		if (CountCNV.count(dataset) > 100) {
@@ -619,7 +624,7 @@ public class TumorGenotyper extends ReadWriteBase {
 
 	protected void output(SaveBean bean, String outdir, TwoBitGenomeReader tgr,
 			String id, String readsStat, AllelicCNV alCNV, GeneExons ge,
-			NoiseAnalysis na2, PeaksInfo pi, int baseploidy, boolean nopdf)
+			NoiseAnalysis na2, PeaksInfo pi, int baseploidy, boolean nopdf,String refflat, String sites)
 			throws Exception {
 
 		DataSet dataset = bean.getDataset();
@@ -639,6 +644,16 @@ public class TumorGenotyper extends ReadWriteBase {
 				dataset, tgr);
 
 		FileOutPut.outputSNP(outdir + id + "_normalsnp.vcf", dataset, tgr, ge);
+		
+		FileOutPut.outputgeneCNV(outdir + id + "_cnv_forgene.txt", ge,refflat);
+		
+		if(sites!=null){
+			
+			FileOutPut.sites(outdir + id + "_disignatedsites.vcf", dataset, tgr, ge,sites);
+			
+		}		
+		
+		FileOutPut.allDiff(outdir + id + "_alldiff.vcf", dataset, tgr, ge);
 
 		if (!nopdf) {
 			PdfReport.report(readsSummary, readsStat, dataset, alCNV, na2, pi,
@@ -659,7 +674,7 @@ public class TumorGenotyper extends ReadWriteBase {
 
 	public SaveBean getReadsAndPileupDataFromBam(String normalbamf,
 			String tumorbamf, TwoBitGenomeReader tgr, String targetRegion,
-			String outputsave, String targetChr, String startend,String refflat)
+			String outputsave, String targetChr, String startend,String refflat, String sites)
 			throws Exception {
 
 		//
@@ -694,7 +709,7 @@ public class TumorGenotyper extends ReadWriteBase {
 			if (tgr.isRefExsist(chrom)) {
 				readsSummary.resetAlreadyregset();
 				execChrom(dataset, chrom,startend, length, normalbamr, tumorbamr, tgr,
-						readsSummary);
+						readsSummary,sites);
 				cnt++;
 			} else {
 				execChromOnlyForReadsStats(chrom, normalbamr, tumorbamr,
@@ -780,7 +795,7 @@ public class TumorGenotyper extends ReadWriteBase {
 
 	private void execChrom(DataSet dataset, String chrom, String startend, int length,
 			SAMFileReader normalbamr, SAMFileReader tumorbamr,
-			TwoBitGenomeReader tgr, ReadsSummary readsSummary)
+			TwoBitGenomeReader tgr, ReadsSummary readsSummary, String sites)
 			throws IOException {
 
 		//
@@ -788,6 +803,14 @@ public class TumorGenotyper extends ReadWriteBase {
 				KarkinosProp.BINBITSIZE);
 		if(ivlist ==null){
 			return;
+		}
+		DefinedSites ds = null;
+		if(sites!=null){
+			
+			//
+			ds = new DefinedSites(sites);
+			ds.load(sites,chrom);
+			
 		}
 
 		// debug
@@ -871,7 +894,7 @@ public class TumorGenotyper extends ReadWriteBase {
 
 			dataset.setBinReads(iv, normalcnt, tumorcnt);
 			System.out.println(Calendar.getInstance().getTime());
-			PileUP.pileup(iv, dataset, normalList, tumorList, tgr, readsSummary);
+			PileUP.pileup(iv, dataset, normalList, tumorList, tgr, readsSummary,ds);
 			System.out.println(Calendar.getInstance().getTime());
 			readsSummary.setReadslent(readslent);
 			readsSummary.setReadslenn(readslenn);

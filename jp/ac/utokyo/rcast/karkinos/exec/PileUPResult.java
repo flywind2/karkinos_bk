@@ -178,6 +178,13 @@ public class PileUPResult implements java.io.Serializable {
 		ratiocalclated = false;
 	}
 
+	
+	public int getRefCnt() {
+		
+		int gidx = seqALL.indexOf(genomeR);
+		return seqCounter[gidx];
+		
+	}
 
 	public int getAltCnt() {
 		if (indel) {
@@ -589,6 +596,7 @@ public class PileUPResult implements java.io.Serializable {
 	}
 
 	public PileUPResult getIndelCopy() {
+		
 		PileUPResult ret = new PileUPResult();
 		ret.totalcnt = totalcnt;
 		ret.indel = indel;

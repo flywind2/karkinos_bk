@@ -16,13 +16,16 @@ limitations under the License.
 package jp.ac.utokyo.rcast.karkinos.exec;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+
+import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.SaveBean;
+import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
+import jp.ac.utokyo.rcast.karkinos.utils.DataHolder;
+import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
+import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -30,31 +33,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
-import net.sf.samtools.util.CloseableIterator;
-import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
-import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.LoadSave;
-import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.SaveBean;
-import jp.ac.utokyo.rcast.karkinos.distribution.AnalyseDist;
-import jp.ac.utokyo.rcast.karkinos.exec.Coverage.IntervalCov;
-import jp.ac.utokyo.rcast.karkinos.filter.FilterAnnotation;
-import jp.ac.utokyo.rcast.karkinos.graph.output.FileOutPut;
-import jp.ac.utokyo.rcast.karkinos.graph.output.PdfReport;
-import jp.ac.utokyo.rcast.karkinos.hmm.HMMCNVAnalysis;
-import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
-import jp.ac.utokyo.rcast.karkinos.readssummary.ReadsSummary;
-import jp.ac.utokyo.rcast.karkinos.utils.Interval;
-import jp.ac.utokyo.rcast.karkinos.utils.ListUtils;
-import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
-import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
-import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletDenoize;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
 
 public class TumorGenotyperReanalysis extends TumorGenotyper {
 
@@ -147,6 +125,11 @@ public class TumorGenotyperReanalysis extends TumorGenotyper {
 
 		optionlist.add(getOption("nopdf", "nopdf", false,
 				"no graphic summary pdf output", false));
+		
+
+		optionlist.add(getOption("sites", "pileupsites", true,
+				"disgnated pileup sites", false));
+
 
 		return optionlist;
 	}
@@ -273,6 +256,11 @@ public class TumorGenotyperReanalysis extends TumorGenotyper {
 			useAvearageNormal = cl.getOptionValue("nd")
 					.equalsIgnoreCase("true");
 		}
+		
+		String sites = null;
+		if (cl.hasOption("sites")) {
+			sites = cl.getOptionValue("sites");					
+		}
 
 		boolean allfileexsist = fileExsistanceCheck(files);
 		if (!allfileexsist) {
@@ -295,11 +283,11 @@ public class TumorGenotyperReanalysis extends TumorGenotyper {
 		// g1000thres,cosmic,
 		// dtc,exonSNP,ge);
 		analysisNew(bean, dbSNP, mappability, tgr, normalbamf,tumorbamf, g1000,
-				g1000thres, cosmic, dtc, exonSNP, ge, useAvearageNormal);
+				g1000thres, cosmic, dtc, exonSNP, ge, useAvearageNormal,sites);
 
 		// output
 		output(bean, outdir, tgr, id, readsStat, alCNV, ge, na, pi, baseploidy,
-				nopdf);
+				nopdf,refflat,sites);
 
 	}
 

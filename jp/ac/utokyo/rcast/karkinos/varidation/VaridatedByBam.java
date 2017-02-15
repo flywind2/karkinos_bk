@@ -15,10 +15,15 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.varidation;
 
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.CigarOperator;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,38 +33,48 @@ import java.util.List;
 import jp.ac.utokyo.rcast.karkinos.exec.IndelInfo;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPPool;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult;
-import jp.ac.utokyo.rcast.karkinos.summary.SummaryStats;
-import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
 import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
-
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.CigarOperator;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.jfree.util.StringUtils;
 
 public class VaridatedByBam extends ReadWriteBase {
 
 	public static void main(String[] arg) {
 
 		//
-		String snvs = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/summary_OVCA-As34_mutation_AAchange_summary.csv";
-		String bam = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/bam";
-		String out = "/GLUSTER_DIST/data/users/ueda/project/Asada/20150410";
+//		String snvs = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/summary_OVCA-As34_mutation_AAchange_summary.csv";
+//		String bam = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/bam";
+//		String out = "/GLUSTER_DIST/data/users/ueda/project/Asada/20150410";
+//		
+		
+		
+		
+		
+//		String snvs = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/summary_OVCA-As34_mutation_AAchange_summary.csv";
+//		String bam = "/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/bam";
+//		String out = "/GLUSTER_DIST/data/users/ueda/project/Asada/20150410";
 		VaridatedByBam inst = new VaridatedByBam();
-		try {
-			inst.exec(snvs, bam, out);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+		String snvs = "/GLUSTER_DIST/data/users/yamamoto/work/asada/cfDNA_detection/mutation_csv";
+		File f = new File(snvs);
+		
+		for(File ff:f.listFiles()){
+			
+			if(ff.isDirectory()){
+				continue;
+			}
+			if(!ff.getName().contains("68")){
+				continue;
+			}
+			
+			String c = ff.getAbsolutePath();
+			String bam = "/GLUSTER_DIST/data/users/yamamoto/work/asada/cfDNA_detection/bam";
+			String out = "/GLUSTER_DIST/data/users/ueda/project/Asada/20151001/";
+			
+			try {
+				inst.exec(c, bam, out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -71,14 +86,14 @@ public class VaridatedByBam extends ReadWriteBase {
 		out = out + (new File(snvs)).getName() + "validate.csv";
 		BufferedWriter br = new BufferedWriter(new FileWriter(out));
 		BufferedReader snvsb = new BufferedReader(new FileReader(snvs));
-		String line = snvsb.readLine();
-		// br.write(line
-		// + "QUAL2,TReads,QUAL3,vREF,vALT,vRatio,vTOTAL,Varidated \n");
-
-		File f = new File(
-				"/GLUSTER_DIST/data/users/yamamoto/exome/OvCa/karkinos4.1.11/summary_OVCA-As34/bam");
+		String line = "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,"
+				+ "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+				+ "1,1,1,1,"
+				+ "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1";
+		
+		
 		StringBuffer titles = new StringBuffer();
-		List<SAMFileReader> list = getL(f,titles);
+		List<SAMFileReader> list = getL(bam,snvs,titles);
 		//
 		br.write(line
 				+ titles +"\n");
@@ -113,9 +128,7 @@ public class VaridatedByBam extends ReadWriteBase {
 			String alt = data[5];
 
 			boolean indel = (ref.length() > 1 || alt.length() > 1);
-			if (indel) {
-				System.out.println(line);
-			}
+
 			//
 			if (isNumber(chr)) {
 				chr = "chr" + chr;
@@ -146,9 +159,11 @@ public class VaridatedByBam extends ReadWriteBase {
 				if (pr.getRatio() > 0.3) {
 					validated = true;
 				}
-				sb.append(","+pr.getRefAltCnt()[0] + "," + pr.getRefAltCnt()[1]
-						+ "," + pr.getRatio() + "," + pr.getTotalcnt() + ","
-						+ validated);
+				sb.append(","+pr.getRefAltCnt()[0] + "," + pr.getRefAltCnt()[1]+ "," + pr.getRatio() + "," + pr.getTotalcnt());
+				
+//				sb.append(","+pr.getRefAltCnt()[0] + "," + pr.getRefAltCnt()[1]
+//						+ "," + pr.getRatio() + "," + pr.getTotalcnt() + ","
+//						+ validated);
 				
 			}
 			br.write(line + sb.toString() + "\n");
@@ -166,6 +181,34 @@ public class VaridatedByBam extends ReadWriteBase {
 		}
 		br.close();
 
+	}
+
+	private List<SAMFileReader> getL(String bam, String snvs,
+			StringBuffer sb) {
+		
+		List<SAMFileReader> list = new ArrayList<SAMFileReader>();
+		File f = new File(bam);
+		String name = snvs.substring(snvs.lastIndexOf('/')+1, snvs.lastIndexOf("_mutation"));
+		
+		for (File ff : f.listFiles()) {
+
+			if (ff.getName().endsWith(".bam")) {
+				
+				if(ff.getName().contains("_normal"))continue;
+				//System.out.println(ff.getName() +"\t" +name);
+				if(ff.getName().contains(name)){
+			
+					
+					SAMFileReader bamr = getReader(ff);
+					list.add(bamr);
+					String na = ff.getName().replaceAll("_genome.bam","");
+					sb.append(","+na+"_vREF"+","+na+"_vALT"+","+na+"_vRatio"+","+na+"_vTotal");
+					//		+","+na+"_vRatio"+","+na+"_vTotal"+","+ff.getName()+"_vValidated");
+				}
+			}
+		}
+		System.out.println(sb.toString());
+		return list;
 	}
 
 	private List<SAMFileReader> getL(File f,StringBuffer sb) {

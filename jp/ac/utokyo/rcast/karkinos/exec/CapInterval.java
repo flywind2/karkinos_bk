@@ -16,9 +16,8 @@ limitations under the License.
 package jp.ac.utokyo.rcast.karkinos.exec;
 
 
-import jp.ac.utokyo.rcast.karkinos.utils.Interval;
+import htsjdk.samtools.SAMRecord;
 import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
-import net.sf.samtools.SAMRecord;
 
 public class CapInterval implements WaveletIF, java.io.Serializable{
 

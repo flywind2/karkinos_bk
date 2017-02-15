@@ -15,10 +15,14 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.varidation;
 
+import htsjdk.samtools.CigarElement;
+import htsjdk.samtools.CigarOperator;
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,23 +34,7 @@ import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPBean;
 import jp.ac.utokyo.rcast.karkinos.exec.IndelInfo;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPPool;
 import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult;
-import jp.ac.utokyo.rcast.karkinos.summary.SummaryStats;
-import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
 import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
-
-import net.sf.samtools.CigarElement;
-import net.sf.samtools.CigarOperator;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMRecordIterator;
-
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.jfree.util.StringUtils;
 
 public class AnnotateDBSnp extends ReadWriteBase {
 

@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import jp.ac.utokyo.rcast.karkinos.utils.DataHolder;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class GeneExons implements java.io.Serializable {
@@ -47,6 +48,40 @@ public class GeneExons implements java.io.Serializable {
 			loadmap(refflat);
 		}
 
+	}
+	
+	Map<String,DataHolder> counterForGene = new LinkedHashMap<String,DataHolder>();
+	long normaltotal;
+	long tumortotal;
+	
+
+	public Map<String, DataHolder> getCounterForGene() {
+		return counterForGene;
+	}
+
+
+	public void setCounterForGene(Map<String, DataHolder> counterForGene) {
+		this.counterForGene = counterForGene;
+	}
+
+
+	public long getNormaltotal() {
+		return normaltotal;
+	}
+
+
+	public void setNormaltotal(long normaltotal2) {
+		this.normaltotal = normaltotal2;
+	}
+
+
+	public long getTumortotal() {
+		return tumortotal;
+	}
+
+
+	public void setTumortotal(long tumortotal) {
+		this.tumortotal = tumortotal;
 	}
 
 	Map<String,Integer> counter = new HashMap<String,Integer>();

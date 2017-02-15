@@ -25,6 +25,7 @@ public class KarkinosProp implements java.io.Serializable {
 
 	
 	public static final float TNQdiff = 10.0f;
+	
 	static Properties config = null;
 
 	public static void load(String pathToConfig) {
@@ -72,8 +73,12 @@ public class KarkinosProp implements java.io.Serializable {
 	// deplicated not using
 	public static int sample_max_bait_size = 200;
 
-	public static double Fisher_Thres_For_Reads_Direction = 0.01;
+	public static double Fisher_Thres_For_Reads_Direction = 0.03;
 	public static double Fisher_Thres_For_SNV_Detection = 0.15;
+	
+	public static final double Fisher_Thres_For_Reads_Direction2 = 0.2;
+	public static final double Fisher_Thres_For_Reads_Direction3 = 0.4;
+	
 	
 	public static float minMapQ = 20;
 	public static float pvalforNoisepeak = 0.1f;

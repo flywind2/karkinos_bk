@@ -15,9 +15,10 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.annotation.loadsave;
 
+import htsjdk.samtools.SAMSequenceRecord;
+
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -26,10 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import jp.ac.utokyo.rcast.karkinos.exec.SNVHolder;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
-
-import net.sf.samtools.SAMSequenceRecord;
 
 //to separate bam pileup and reads counting process to
 //later analysis process;

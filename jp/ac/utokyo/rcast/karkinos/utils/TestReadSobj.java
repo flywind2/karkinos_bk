@@ -25,13 +25,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.FileComparator;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.LoadUtils;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.SaveBean;
-import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
 import jp.ac.utokyo.rcast.karkinos.readssummary.ReadsCounter;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
-import net.sf.samtools.SAMSequenceRecord;
 
 public class TestReadSobj {
 

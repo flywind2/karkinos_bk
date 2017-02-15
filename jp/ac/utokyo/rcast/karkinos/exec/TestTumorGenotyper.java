@@ -94,8 +94,18 @@ public class TestTumorGenotyper {
 //		String normalbamf = "/GLUSTER_DIST/data/users/ueda/ICGC/NCCWGS/Normal/HX5WGS_N.bam";
 //		String tumorbamf = "/GLUSTER_DIST/data/users/ueda/ICGC/NCCWGS/Tumor/HX5WGS_T.bam";
 	
-		String normalbamf = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/synthetic.challenge.set4.normal_m.bam";
-		String tumorbamf = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/synthetic.challenge.set4.tumor_m.bam";
+		//String normalbamf = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/synthetic.challenge.set4.normal_m.bam";
+		//String tumorbamf = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/synthetic.challenge.set4.tumor_m.bam";
+		
+		
+//		String normalbamf = "/data3/users/yamamoto/exome/CRC/karkinos4.1.11/summary_CRC_all_samples/bam/CRC107_T-CRC107_N_normal_genome.bam";
+//		String tumorbamf = "/data3/users/yamamoto/exome/CRC/karkinos4.1.11/summary_CRC_all_samples/bam/CRC107_T-CRC107_N_tumor_genome.bam";
+//		String middelfile="/GLUSTER_DIST/data/users/yamamoto/exome/CRC/karkinos2.0.3/CRC_107_T-CRC_107_N/sobj";
+		
+		String normalbamf = "/data/users/yamamoto/TodaiPanel/bam/PLC-TK-3N_TDv3_genome.bam";
+		String tumorbamf = "/data/users/yamamoto/TodaiPanel/bam/PLC-TK-3TA_TDv3_genome.bam";
+		String middelfile = "/GLUSTER_DIST/data/users/ueda/toptest/sobj/TK-3saveobj.obj";
+		
 		
 //		String normalbamf =  "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT12-1-MT12N/normal/MT12-1-MT12N_normal_genome.bam";
 //		String tumorbamf = "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/MT/MT12-1-MT12N/tumor/MT12-1-MT12N_tumor_genome.bam";
@@ -105,14 +115,16 @@ public class TestTumorGenotyper {
 		
 		//String middelfile = "/GLUSTER_DIST/data/users/yamamoto/exome/Glioma/karkinos4.1.11/MT/MT12-1-MT12N_k2/sobj";
 		
-		String middelfile = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/challenge4/sobj";
+		//String middelfile = "/GLUSTER_DIST/data/users/ueda/project/DreamChallenge/challenge4/sobj";
 		
 		String twobitref = "/GLUSTER_DIST/data/Genomes/hg19_all/hg19.2bit";
 		//String dbSNP = "/GLUSTER_DIST/data/users/ueda/SNVtest/hg19_ALL.sites.2012_02.txt";
 		String dbSNP = "/GLUSTER_DIST/data/users/ueda/genome/dbSNP132/hg19_snp132.txt";
 		String g1000 = "/GLUSTER_DIST/data/users/ueda/genome/dbSNP132/hg19_ALL.sites.2012_02.txt";
 		
-		String targetRegion = "/GLUSTER_DIST/data/Genomes/hg19capv4/captureregionv4all.bed";
+		String targetRegion = "/data/users/yamamoto/TodaiPanel/target/S3035822_Covered.bed";
+		
+		//String targetRegion = "/GLUSTER_DIST/data/Genomes/hg19capv4/captureregionv4all.bed";
 		//String targetRegion ="/GLUSTER_DIST/data/Genomes/karkinos/genome/vcrome2.1.bed";
 		//String targetRegion ="/GLUSTER_DIST/data/Genomes/karkinos/genome/halo_ver2_Regions.bed";
 		//String mappability = "/GLUSTER_DIST/data/users/ueda/SNVtest/wgEncodeCrgMapabilityAlign100mer.bw";
@@ -120,38 +132,47 @@ public class TestTumorGenotyper {
 		//String outdir = "/GLUSTER_DIST/data/users/ueda/karkinostest2/";
 		//String outdir = "/GLUSTER_DIST/data/users/ueda/project/gotoh/S1-S7";
 		
-		String outdir = "/GLUSTER_DIST/data/users/ueda/DreamChallenge/ch4";
+		//String outdir = "/GLUSTER_DIST/data/users/ueda/test2";
+		String outdir = "/GLUSTER_DIST/data/users/ueda/toptest";
 		String propfile = "/usr/local/karkinos/karkinos4.0/karkinos.properties";
+		
+		String definedList = "/GLUSTER_DIST/data/users/ueda/toptest/deftest.txt";
 		
 		//
 		List<String> l = new ArrayList<String>();
 		//add(l,"-n",normalbamf);
-		add(l,"-md",middelfile);
+		//add(l,"-md",middelfile);
 		add(l,"-n",normalbamf);
 		add(l,"-t",tumorbamf);
 		//add(l,"-chr","chr1");
 		//add(l,"-startend","2");
 		add(l,"-r",twobitref);
 		add(l,"-snp",dbSNP);
-		//add(l,"-ct",targetRegion);
+		add(l,"-ct",targetRegion);
 		add(l,"-mp",mappability);
-		add(l,"-id","ch4");
+		//add(l,"-id","CRC_107_T-CRC_107_N");
+		add(l,"-id","TK-3");
 		add(l,"-o",outdir);
 		add(l,"-prop",propfile);
 		add(l,"-g1000",g1000);
 		add(l,"-g1000freq","0.01");
-		add(l,"-tc","1.0");
+		//add(l,"-tc","1.0");
 		//add(l,"-rg","/GLUSTER_DIST/data/Genomes/ucscgene_hg19/totoki_hg19/refFlat_120402.txt");
+		
+		add(l,"-rg","/GLUSTER_DIST/data/users/ueda/toptest/top_refflathg19.txt");
 		add(l,"-cosmic","/usr/local/karkinos/karkinos/genome/CosmicCompleteExport_v62_291112.vcf");
 		add(l,"-exonSNP","/usr/local/karkinos/karkinos/genome/exomeSNP.vcf");
+		
+		add(l,"-sites",definedList); 
+				
 		//add(l,"-nd","true");
 		
 		//add(l,"-rs","/GLUSTER_DIST/data/users/ueda/karkinostest2/C39/total_reads_stats_n.txt," +
 		//		"/GLUSTER_DIST/data/users/ueda/karkinostest2/C39/total_reads_stats_t.txt");
 		
 		String[] ar = l.toArray(new String[l.size()]);
-		TumorGenotyperReanalysis.main(ar);
-		//TumorGenotyper.main(ar);
+		//TumorGenotyperReanalysis.main(ar);
+		TumorGenotyper.main(ar);
 		
 	}
 

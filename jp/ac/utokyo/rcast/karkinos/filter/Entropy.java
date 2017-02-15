@@ -15,8 +15,6 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.filter;
 
-import net.sf.samtools.util.StringUtil;
-
 public class Entropy {
 
 	public static void main(String[] arg){

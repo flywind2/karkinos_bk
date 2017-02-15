@@ -15,13 +15,11 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.annotation.loadsave;
 
+import htsjdk.samtools.SAMSequenceRecord;
+
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
-
-import net.sf.samtools.SAMSequenceRecord;
-
-import org.apache.commons.cli.Option;
 
 public class FileComparator implements Comparator<File> {
 

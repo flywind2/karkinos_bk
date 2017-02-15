@@ -15,24 +15,16 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.alleliccnv;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
-import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
-import jp.ac.utokyo.rcast.karkinos.exec.DataSet;
 import jp.ac.utokyo.rcast.karkinos.exec.KarkinosProp;
 import jp.ac.utokyo.rcast.karkinos.wavelet.DistMedian;
-import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
-import math.transform.jwave.Transform;
-import math.transform.jwave.handlers.FastWaveletTransform;
-import math.transform.jwave.handlers.wavelets.Haar02;
+import jwave.Transform;
+import jwave.transforms.FastWaveletTransform;
+import jwave.transforms.wavelets.haar.Haar1;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class WaveletDenoizeACNV {
 
@@ -421,7 +413,7 @@ public class WaveletDenoizeACNV {
 			}
 		}
 
-		Transform t = new Transform(new FastWaveletTransform(new Haar02()));
+		Transform t = new Transform(new FastWaveletTransform(new Haar1()));
 		// System.out.println("input size="+input.length);
 		double[] arrHilb1 = t.forward(input1); // 1-D AED FWT Haar forward
 		double[] arrHilb2 = t.forward(input2);
@@ -430,7 +422,7 @@ public class WaveletDenoizeACNV {
 		int size = dlist.size() / (int) Math.pow(2, denoiseLevel);
 		int nn = 0;
 		for (double d : arrHilb1) {
-
+ 
 			if (nn > size) {
 				arrHilb1[nn] = 0;
 				arrHilb2[nn] = 0;

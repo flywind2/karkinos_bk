@@ -124,19 +124,26 @@ public class BandCNV {
 		// String out = "/GLUSTER_DIST/data/users/ueda/earlyCNVsummary.txt";
 		// String out =
 		// "/GLUSTER_DIST/data/users/ueda/project/Aihara/AIsummary.txt";
-		String out = "/GLUSTER_DIST/data/users/ueda/project/Mano/PCNSL_summary.txt";
+		//String out = "/GLUSTER_DIST/data/users/ueda/project/Mano/PCNSL_summary.txt";
 		//
+		String out = "/GLUSTER_DIST/data/users/ueda/earlyCNVsummaryEHCC.txt";
 
 		// String array =
 		// "/GLUSTER_DIST/data/users/yamamoto/exome/HCC/SNP6/selected/Baylor/txt";
 		// String exome =
 		// "/GLUSTER_DIST/data/users/yamamoto/exome/EHCC/EHCC_exome";
-		// String exome =
-		// "/GLUSTER_DIST/data/users/yamamoto/work/midorikawa/EHCC_karkinos/karkinos4.1.11";
+		 String exome =
+		 "/GLUSTER_DIST/data/users/ueda/project/Midorikawa/EHCC";
 
-		String exome = "/GLUSTER_DIST/data/users/ueda/project/Mano/karkinos_results/";
+		//String exome = "/GLUSTER_DIST/data/users/ueda/project/Mano/karkinos_results/";
+		
+		//String exome = "/GLUSTER_DIST/data/users/ueda/project/Mano/karkinos_results";
+		
 		List<File> list = new ArrayList<File>();
 		searchRecursive(new File(exome), list);
+		
+		//
+		
 
 		List<File> list2 = new ArrayList<File>();
 		searchRecursive2(new File(exome), list2);

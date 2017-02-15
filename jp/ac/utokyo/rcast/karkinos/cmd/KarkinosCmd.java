@@ -26,7 +26,8 @@ import jp.ac.utokyo.rcast.karkinos.varidation.VaridateByBam;
 
 public class KarkinosCmd {
 
-	public static final String version = "Karkinos2.0 version 0.1 2013/4/22";
+	//public static final String version = "Karkinos2.0 version 0.1 2013/4/22";
+	public static final String version = "Karkinos2.0 version 0.3 2016/11/30";
 
 	public static void main(String[] arg) throws Exception {
 

@@ -12,26 +12,33 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
+ */
 package jp.ac.utokyo.rcast.karkinos.graph.output;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import au.com.bytecode.opencsv.CSVReader;
 import jp.ac.utokyo.karkinos.noisefilter.NoiseAnalysis;
 import jp.ac.utokyo.rcast.karkinos.alleliccnv.AllelicCNV;
 import jp.ac.utokyo.rcast.karkinos.alleliccnv.SNVHolderPlusACnv;
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
 import jp.ac.utokyo.rcast.karkinos.exec.CapInterval;
 import jp.ac.utokyo.rcast.karkinos.exec.DataSet;
+import jp.ac.utokyo.rcast.karkinos.exec.PileUPResult;
 import jp.ac.utokyo.rcast.karkinos.exec.SNVHolder;
+import jp.ac.utokyo.rcast.karkinos.filter.DefinedSites;
 import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
 import jp.ac.utokyo.rcast.karkinos.readssummary.Interval;
 import jp.ac.utokyo.rcast.karkinos.readssummary.ReadsSummary;
+import jp.ac.utokyo.rcast.karkinos.utils.DataHolder;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
 import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
 
@@ -229,6 +236,104 @@ public class FileOutPut {
 		}
 
 	}
+	
+
+	// chr
+	// pos
+	// id
+	// ref
+	// alt
+	// qual
+	// refcnt;
+	// altcnt;
+	// freq;
+	// alt
+	// qual
+	// refcnt;
+	// altcnt;
+	// freq;
+	// info
+	// tn ratio
+
+	
+	public static void sites(String outpath, DataSet dataset,
+			TwoBitGenomeReader tgr, GeneExons ge, String sites) {
+		
+		try {
+
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(outpath)));
+			
+			DefinedSites ds = new DefinedSites(sites);
+			
+			bw.append("#CHROM	POS	ID	REF	ALT_N	QUAL_N	REFCNT_N	ALTCNT_N 	FEEQ_N	"
+					+ "ALT_T	QUAL_T	REFCNT_T	ALTCNT_T 	FEEQ_T	INFO	TNRATIO" + "\n");
+
+			// float tumorRratio = dataset.getTumorRatio();
+			for (SNVHolder holder : dataset.getSnvlist()) {
+				
+				String chr = holder.getChr();
+				int pos = holder.getPos();
+				if(ds.contains(chr, pos)){
+				   				
+				  String[] stra = FormatHelper.getLine(holder, tgr, ge);
+				  if (stra != null) {
+					  
+					 for(String s:stra){
+						 
+						 bw.write(s);
+						 bw.write("\t");
+					 }
+					 bw.write("\n");
+				  }
+				  
+				}
+			}
+			bw.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		
+	}
+
+	public static void allDiff(String outpath, DataSet dataset,
+			TwoBitGenomeReader tgr, GeneExons ge) {
+
+		try {
+
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(outpath)));
+			bw.append("##fileformat=VCFv4.1" + "\n");
+
+			bw.append("##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">"
+					+ "\n");
+			bw.append("##INFO=<ID=AF,Number=A,Type=Float,Description=\"Allele Frequency\">"
+					+ "\n");
+			bw.append("##INFO=<ID=DB,Number=0,Type=Flag,Description=\"dbSNP membership\">"
+					+ "\n");
+			bw.append("##INFO=<ID=geneID,Number=0,Type=Flag,Description=\"refseq gene id\">"
+					+ "\n");
+			bw.append("##INFO=<ID=onCDS,Number=0,Type=Flag,Description=\"on cds\">"
+					+ "\n");
+			bw.append("##INFO=<ID=1000freq,Number=0,Type=Flag,Description=\"allele frequency of 1000 genome\">"
+					+ "\n");
+			bw.append("#CHROM	POS	ID	REF	ALT	QUAL		" + "\n");
+
+			// float tumorRratio = dataset.getTumorRatio();
+			for (SNVHolder holder : dataset.getSnvlist()) {
+
+				String str = FormatHelper.getVCFLineAllDiff(holder, tgr, ge);
+				if (str != null) {
+					bw.write(str + "\n");
+				}
+			}
+			bw.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
 
 	public static void outputSNP(String outpath, DataSet dataset,
 			TwoBitGenomeReader tgr, GeneExons ge) {
@@ -277,10 +382,9 @@ public class FileOutPut {
 			bw.write("#chr" + "\t" + "start" + "\t" + "end" + "\t"
 					+ "normaldepth" + "\t" + "tumordepth" + "\t" + "t/nRatio"
 					+ "\t" + "t/nRatioAdj" + "\t" + "smoothedRatio" + "\t"
-					+ "adjustedRatio" + "\t"
-					+ "AalleleCopyNumber" + "\t" + "BalleleCopyNumber" + "\t"
-					+ "copyNumber" + "\n");
-			float factor = 1/purity;
+					+ "adjustedRatio" + "\t" + "AalleleCopyNumber" + "\t"
+					+ "BalleleCopyNumber" + "\t" + "copyNumber" + "\n");
+			float factor = 1 / purity;
 			for (List<WaveletIF> list : dataset.getCapInterval()) {
 
 				for (WaveletIF wi : list) {
@@ -294,10 +398,11 @@ public class FileOutPut {
 							+ format(ci.getCNVInfo().getOriginalTnratio())
 							+ "\t" + format(ci.getCNVInfo().getTnratio())
 							+ "\t" + format(ci.getCNVInfo().getDenoise())
-							+ "\t" + format(ci.getCNVInfo().getDenoise()*factor)
+							+ "\t"
+							+ format(ci.getCNVInfo().getDenoise() * factor)
 							+ "\t" + format(ci.getAafreq()) + "\t"
 							+ format(ci.getBafreq()) + "\t"
-							+ format(ci.getHMMValue()*2) + "\n");
+							+ format(ci.getHMMValue() * 2) + "\n");
 
 				}
 			}
@@ -314,50 +419,41 @@ public class FileOutPut {
 		return nf.format(num);
 	}
 
-	public static void outputAlleleDepth(AllelicCNV alCNV, String outpath, float purity) {
+	public static void outputAlleleDepth(AllelicCNV alCNV, String outpath,
+			float purity) {
 		try {
 
 			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(outpath)));
 
-			bw.write("#chr" + "\t"
-					+ "pos" + "\t" 
-					+ "id"  +"\t"
-					+ "highAlleleRow" + "\t" 
-					+ "lowAlleleRow" + "\t"
-					+ "highAlleleAdj" + "\t" 
-					+ "lowAlleleAdj" + "\t"
-					+ "highSmooth" + "\t" 
-					+ "lowSmooth" + "\t"
-					+ "highSmoothAdj" + "\t" 
-					+ "lowSmoothAdj" + "\t"
-					+ "highHMM" + "\t" 
-					+ "lowHMM" + "\n");
+			bw.write("#chr" + "\t" + "pos" + "\t" + "id" + "\t"
+					+ "highAlleleRow" + "\t" + "lowAlleleRow" + "\t"
+					+ "highAlleleAdj" + "\t" + "lowAlleleAdj" + "\t"
+					+ "highSmooth" + "\t" + "lowSmooth" + "\t"
+					+ "highSmoothAdj" + "\t" + "lowSmoothAdj" + "\t"
+					+ "highHMM" + "\t" + "lowHMM" + "\n");
 
-			float factor = 1/purity;
+			float factor = 1 / purity;
 			for (List<SNVHolderPlusACnv> plist : alCNV.getList()) {
 
 				for (SNVHolderPlusACnv sc : plist) {
 
-					String id= ".";
+					String id = ".";
 					if (sc.getSnv().getDbSNPbean() != null) {
 						// id
 						id = sc.getSnv().getDbSNPbean().getInfo();
 
-					} 
-					
-					
-					bw.write(sc.getSnv().getChr() + "\t" 
-							+ sc.getSnv().getPos() + "\t"
-							+id+"\t"
-							+ sc.getHighera().getRow() + "\t"
-							+ sc.getLowera().getRow() + "\t"
+					}
+
+					bw.write(sc.getSnv().getChr() + "\t" + sc.getSnv().getPos()
+							+ "\t" + id + "\t" + sc.getHighera().getRow()
+							+ "\t" + sc.getLowera().getRow() + "\t"
 							+ sc.getHighera().getGcadjusted() + "\t"
 							+ sc.getLowera().getGcadjusted() + "\t"
 							+ sc.getHighera().getWtval() + "\t"
 							+ sc.getLowera().getWtval() + "\t"
-							+ sc.getHighera().getWtval()*factor + "\t"
-							+ sc.getLowera().getWtval()*factor + "\t"							
+							+ sc.getHighera().getWtval() * factor + "\t"
+							+ sc.getLowera().getWtval() * factor + "\t"
 							+ sc.getHighera().getHmmval() + "\t"
 							+ sc.getLowera().getHmmval() + "\n");
 
@@ -370,5 +466,99 @@ public class FileOutPut {
 		}
 
 	}
+
+	
+	public static final String title ="genesymbol \t name \t chrom \t strand \t txStart \t txEnd"
+			+ "\t cdsStart \t cdsEnd \t ExonCnt \t starts \t ends "
+			+ "\t normalcnt \t tumorcnt \t normalNorm \t tumorNorm \t tnratio \t LRR "
+			+ "\t tnsmooth \t cnvhmm \t  AAF \t BAF";
+	public static void outputgeneCNV(String outpath, GeneExons ge,
+			String refflat) {
+
+		try {
+			//
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(outpath)));
+			
+			bw.write(title);
+			bw.write("\n");
+
+			Map<String, DataHolder> counterForGene = ge.getCounterForGene();
+
+			CSVReader brcvs = new CSVReader(new FileReader(refflat), '\t');
+
+			String[] data = null;
+			List<String> l = null;
+
+			while ((data = brcvs.readNext()) != null) {
+
+				String refseqid = data[1];
+				l = new ArrayList<String>();
+				for (String d : data)
+					l.add(d);
+				//
+				DataHolder df = counterForGene.get(refseqid);
+				if (df != null) {
+					df.setTotal(ge.getNormaltotal(), ge.getTumortotal());
+
+					l.add(String.valueOf(df.getNormalcnt()));
+					l.add(String.valueOf(df.getTumorcnt()));
+
+					l.add(String.valueOf(df.normalAdjust()));
+					l.add(String.valueOf(df.tumorAdjust()));
+
+					l.add(String.valueOf(df.tumorRatio()));
+					l.add(String.valueOf(df.logr()));
+					
+					l.add(String.valueOf(df.averages()[0]));
+					l.add(String.valueOf(df.averages()[1]));
+					l.add(String.valueOf(df.averages()[2]));
+					l.add(String.valueOf(df.averages()[3]));
+					l.add(String.valueOf(df.averages()[4]));
+					
+
+				} else {
+
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+					l.add(String.valueOf(0));
+					
+				}
+				
+				boolean first = true;
+				for(String s:l){
+					
+					if(first){
+						first = false;
+						
+					}else{
+						bw.write("\t");
+					}
+					bw.write(s);
+					
+				}
+				bw.write("\n");
+			}
+			
+
+			bw.close();
+			brcvs.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+
 
 }

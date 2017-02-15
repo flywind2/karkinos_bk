@@ -15,6 +15,9 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec.develop;
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMSequenceRecord;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,42 +26,28 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import jp.ac.utokyo.karkinos.noisefilter.NoiseAnalysis;
-import jp.ac.utokyo.karkinos.ploidy.MatchMatrixBean;
 import jp.ac.utokyo.karkinos.ploidy.PloidyResolve;
 import jp.ac.utokyo.rcast.karkinos.alleliccnv.AllelicCNV;
-import jp.ac.utokyo.rcast.karkinos.alleliccnv.CNVUtils;
-import jp.ac.utokyo.rcast.karkinos.alleliccnv.CheckPossibleHDAmp;
-import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.LoadSave;
 import jp.ac.utokyo.rcast.karkinos.annotation.loadsave.SaveBean;
 import jp.ac.utokyo.rcast.karkinos.exec.DataSet;
 import jp.ac.utokyo.rcast.karkinos.exec.KarkinosProp;
-import jp.ac.utokyo.rcast.karkinos.exec.TumorGenotyperReanalysis;
-import jp.ac.utokyo.rcast.karkinos.filter.FilterAnnotation;
 import jp.ac.utokyo.rcast.karkinos.graph.output.CNVVcf;
 import jp.ac.utokyo.rcast.karkinos.graph.output.FileOutPut;
 import jp.ac.utokyo.rcast.karkinos.graph.output.PdfReport;
 import jp.ac.utokyo.rcast.karkinos.graph.output.TextSummary;
-import jp.ac.utokyo.rcast.karkinos.hmm.AdjustBetweenState;
-import jp.ac.utokyo.rcast.karkinos.hmm.CountCNV;
 import jp.ac.utokyo.rcast.karkinos.hmm.HMMCNVAnalysis;
 import jp.ac.utokyo.rcast.karkinos.hmm.HMMCNVAnalysisFromEM;
 import jp.ac.utokyo.rcast.karkinos.readssummary.GeneExons;
 import jp.ac.utokyo.rcast.karkinos.readssummary.ReadsSummary;
-import jp.ac.utokyo.rcast.karkinos.utils.CorrelVaridate;
 import jp.ac.utokyo.rcast.karkinos.utils.OptionComparator;
 import jp.ac.utokyo.rcast.karkinos.utils.ReadWriteBase;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
 import jp.ac.utokyo.rcast.karkinos.wavelet.EMMethod;
-import jp.ac.utokyo.rcast.karkinos.wavelet.GCParcentAdjust;
 import jp.ac.utokyo.rcast.karkinos.wavelet.PeaksInfo;
 import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletDenoize;
-
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMSequenceRecord;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;

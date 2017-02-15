@@ -15,16 +15,16 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec;
 
-import java.util.ArrayList;
+import htsjdk.samtools.SAMRecord;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import net.sf.samtools.SAMRecord;
 
 import jp.ac.utokyo.rcast.karkinos.bean.BaitSampling;
 import jp.ac.utokyo.rcast.karkinos.utils.Interval;

@@ -15,6 +15,10 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.utils;
 
+import htsjdk.samtools.SAMFileReader;
+import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.util.CloseableIterator;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,10 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.util.CloseableIterator;
 
 public class TSSDepthStats extends ReadWriteBase {
 

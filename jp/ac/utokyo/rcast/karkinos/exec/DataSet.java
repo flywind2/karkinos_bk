@@ -15,28 +15,16 @@ limitations under the License.
 */
 package jp.ac.utokyo.rcast.karkinos.exec;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import htsjdk.samtools.SAMRecord;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
-import net.sf.samtools.SAMRecord;
-
-import jp.ac.utokyo.rcast.karkinos.alleliccnv.AllelicCNV;
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPAnnotation;
 import jp.ac.utokyo.rcast.karkinos.annotation.DbSNPBean;
 import jp.ac.utokyo.rcast.karkinos.distribution.AnalyseDist;
@@ -45,6 +33,8 @@ import jp.ac.utokyo.rcast.karkinos.utils.Interval;
 import jp.ac.utokyo.rcast.karkinos.utils.TwoBitGenomeReader;
 import jp.ac.utokyo.rcast.karkinos.wavelet.FunctionRegression;
 import jp.ac.utokyo.rcast.karkinos.wavelet.WaveletIF;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 public class DataSet implements java.io.Serializable {
 
